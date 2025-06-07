@@ -1,19 +1,13 @@
 БД
-
     USER_GROUP
         id
         name  (Игроки, Админы, ...)
-
     USER
         id
         name  (Иван Иванов, Петр, ... )
         tg_id
-
-    USER_TO_USER_GROUP
-        id
-        user_id -> USER.id
-        user_group_id -> USER_GROUP.id
-
+        tg_username
+        user_group_id
     EVENT
         id
         date_time    
@@ -22,26 +16,94 @@
         description        
         max_users_count
         price
-        creator -> USER.id        
-
-    USER_EVENT_STATUS
-        id
-        name  (Основа, резерв, ...)
-
+        user_id  
     USER_TO_EVENT
         id
-        event -> EVENT.id
-        user -> USER.id
-        status -> USER_EVENT_STATUS.id
+        event_id
+        user_id
+        status (main, reserve)
         friends_count
-        is_visited
+        result  (visited, missed)
 
-    MEDIA
+==================================================
+
+API
+    POST /user_groups - добавить группу пользователей
+        name
+    GET /user_groups - получить все группы пользователей
         id
         name
-        filename
-        event -> EVENT.id
+        users_count
+    GET /user_groups/[id] - получить группу пользователей
+        id
+        name
+        users            
+    DELETE /user_groups/[id] - удалить группу пользователей
+    PUT /user_groups/[id] - изменить группу пользователей
+        name
+    -----------------------------------------------------
+    POST /users - добавить пользователя
+        name
+        tg_id
+        user_group_id
+    GET /users - получить всех пользователей
+        id
+        name
+        tg_id
+        tg_username
+        user_group_name
+    GET /users/[id] - получить пользователя
+        id
+        name
+        tg_id
+        tg_username
+        user_group_name
+    DELETE /users/[id] - удалить пользователя
+    PUT /users/[id] - изменить пользователя
+        name
+        tg_id
+        tg_username
+        user_group_id
+    -----------------------------------------------------
+    POST /events - добавить событие
+        date_time    
+        duration    
+        name
+        description        
+        max_users_count
+        price
+        user_id
+    GET /events - получить все события
+        id
+        date_time
+        name
+        duration
+        price
+        max_users_count
+        main_users_count
+        reserve_users_count
+    DELETE /events/[id] - удалить событие
+    PUT /events/[id] - изменить событие
+        date_time    
+        duration    
+        name
+        description        
+        max_users_count
+        price
+    -----------------------------------------------------
+    POST /user_to_events - добавить пользователя к событию
+        event_id
+        user_id
+        user_event_status
+    DELETE /user_to_events/user/[id]/event/[id] - удалить пользователя из события
+    PUT /user_to_events/user/[id]/event/[id] - изменить пользователя в событии
+        user_event_status_id
+        user_event_status
+        result
+    GET /user_to_events/user/[id] - получить события пользователя
+    GET /user_to_events/event/[id] - получить пользователей события 
 
 
+    
 
 
