@@ -8,3 +8,4 @@ export const deployConfig = {
   remoteDir: '/var/www/wwwuser/data/www/tvsboy.com/che_team/assets',
   localDir: './dist/assets',
 }
+//----------
