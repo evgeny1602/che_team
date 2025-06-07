@@ -1,0 +1,38 @@
+БД
+
+    USER_GROUP
+        id
+        name
+
+    USER
+        id
+        name
+        tg_id
+
+    USER_TO_USER_GROUP
+        id
+        user_id -> USER.id
+        user_group_id -> USER_GROUP.id
+
+    EVENT
+        id
+        date_time        
+        name
+        description
+        price
+        creator -> USER.id
+        max_users_count
+
+    USER_EVENT_STATUS
+        id
+        name
+
+    USER_TO_EVENT
+        id
+        event -> EVENT.id
+        user -> USER.id
+        status -> USER_EVENT_STATUS.id
+
+
+
+
