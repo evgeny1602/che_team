@@ -2,11 +2,11 @@
 
     USER_GROUP
         id
-        name
+        name  (Игроки, Админы, ...)
 
     USER
         id
-        name
+        name  (Иван Иванов, Петр, ... )
         tg_id
 
     USER_TO_USER_GROUP
@@ -16,22 +16,31 @@
 
     EVENT
         id
-        date_time        
-        name
-        description
-        price
-        creator -> USER.id
+        date_time    
+        duration    
+        name  (Тренировка в Юбилейном, Тренировка в РИИ с тренером, ...)
+        description        
         max_users_count
+        price
+        creator -> USER.id        
 
     USER_EVENT_STATUS
         id
-        name
+        name  (Основа, резерв, ...)
 
     USER_TO_EVENT
         id
         event -> EVENT.id
         user -> USER.id
         status -> USER_EVENT_STATUS.id
+        friends_count
+        is_visited
+
+    MEDIA
+        id
+        name
+        filename
+        event -> EVENT.id
 
 
 
