@@ -8,20 +8,22 @@
         tg_id
         tg_username
         user_group_id
+        is_approved
     EVENT
         id
         date_time    
         duration    
         name  (Тренировка в Юбилейном, Тренировка в РИИ с тренером, ...)
-        description        
+        description     
+        min_users_count   
         max_users_count
         price
         user_id  
+        is_held (true = игра состоялась, false = игра не состоялась)
     USER_TO_EVENT
         id
         event_id
         user_id
-        status (main, reserve)
         friends_count
         result  (visited, missed)
 
@@ -46,12 +48,14 @@ API
         name
         tg_id
         user_group_id
+    GET /users/approve/[id] - одобрить пользователя
     GET /users - получить всех пользователей
         id
         name
         tg_id
         tg_username
         user_group_name
+        is_approved
     GET /users/[id] - получить пользователя
         id
         name
@@ -69,7 +73,8 @@ API
         date_time    
         duration    
         name
-        description        
+        description      
+        min_users_count  
         max_users_count
         price
         user_id
@@ -79,17 +84,21 @@ API
         name
         duration
         price
+        min_users_count
         max_users_count
         main_users_count
         reserve_users_count
+        is_held
     DELETE /events/[id] - удалить событие
     PUT /events/[id] - изменить событие
         date_time    
         duration    
         name
-        description        
+        description      
+        min_users_count  
         max_users_count
         price
+        is_held
     -----------------------------------------------------
     POST /user_to_events - добавить пользователя к событию
         event_id
@@ -102,7 +111,143 @@ API
         result
     GET /user_to_events/user/[id] - получить события пользователя
     GET /user_to_events/event/[id] - получить пользователей события 
+    -----------------------------------------------------
+    GET /statistics/events - получить статистику по событиям
+        id
+        date_time    
+        duration    
+        name
+        description   
+        min_users_count     
+        max_users_count
+        fact_users_count
+        price        
+        is_held
+    GET /statistics/event/[id] - получить статистику по событию
+        date_time    
+        duration    
+        name
+        description  
+        min_users_count      
+        max_users_count
+        fact_users_count
+        price
+        is_held
+        users
+            name
+            tg_id
+            tg_username
+            user_group_name
+    GET /statistics/users - получить статистику по пользователям
+        id
+        name
+        tg_id
+        tg_username
+        user_group_name
+        visited_events_count
+    GET /statistics/user/[id] - получить статистику по пользователю
+        id
+        name
+        tg_id
+        tg_username
+        user_group_name
+        events
+            date_time    
+            duration    
+            name
+            description        
+            max_users_count
+            price
+            fact_users_count
+            is_held
 
+======================================================
+
+СТРУКТУРА
+    Мои игры
+        Дата и время
+        Название
+        Описание
+        Длительность
+        Мин. кол-во игроков
+        Макс. кол-во игроков
+        Цена
+        Кол-во игроков        
+        Кол-во в резерве
+        Я в основе/резерве - показывает статус пользователя в событии
+        Запланировано/Состоялась/Не состоялось
+        [Игроки]
+        [Игроки в резерве]
+        [Не приду]
+    Игры
+        [Добавить игру] - только для админов  
+
+        Дата и время
+        Название
+        Описание
+        Длительность
+        Мин. кол-во игроков
+        Макс. кол-во игроков
+        Цена
+        Кол-во игроков
+        Кол-во в резерве
+        Запланировано/Состоялась/Не состоялось
+        [Игроки]
+        [Игроки в резерве]
+        [Приду]/[Не приду]/[Меня в резерв] - зависит от статуса пользователя и количества участников в событии  
+        [Удалить] - только для админов  
+    Игроки
+        Имя    
+        Группа    
+        Username в Telegram
+        ID в Telegram        
+        Одобрен/Ожидает одобрения     
+        [Одобрить] - только для админов
+        [Удалить] - только для админов
+    Статистика - только для админов
+        Игры
+            Дата и время 
+            Название
+            Описание   
+            Длительность 
+            Мин. кол-во игроков
+            Макс. кол-во игроков
+            Цена
+            Запланировано/Состоялась/Не состоялось
+            Количество игроков
+            Количество игроков в резерве
+            Игроки
+                Имя
+                [Игрок]
+            Игроки в резерве
+                Имя
+                [Игрок]
+        Игроки
+            Имя
+            Группа
+            Username в Telegram
+            ID в Telegram
+            Игры в основе
+                Дата и время 
+                Название
+                [Игра]
+            Игры в резерве
+                Дата и время 
+                Название
+                [Игра]
+    Моя статистика
+        Кол-во игр в основе
+        Кол-во игр в резерве
+        Игры в основе
+            Дата и время 
+            Название
+            Запланировано/Состоялась/Не состоялось
+            [Игра]
+        Игры в резерве
+            Дата и время 
+            Название
+            Запланировано/Состоялась/Не состоялось
+            [Игра]
 
     
 

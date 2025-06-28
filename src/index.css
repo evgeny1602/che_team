@@ -1,1 +1,30 @@
 @import 'tailwindcss';
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-blink {
+  animation: blink 1200ms infinite;
+}
+
+.animate-spin {
+  animation: spin 2500ms infinite linear;
+}

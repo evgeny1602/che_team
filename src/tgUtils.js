@@ -1,5 +1,9 @@
+import { useState } from 'react'
+
 const tg = window.Telegram.WebApp
 const isTg = tg.initData != ''
+
+let tgTheme = 'light'
 
 let tgUser = {
   id: null,
@@ -24,6 +28,8 @@ let tgColorClasses = {
 if (isTg) {
   tgUser = tg.initDataUnsafe.user
 
+  tgTheme = tg.colorScheme
+
   tgColorClasses = {
     bg: 'bg-[var(--tg-theme-bg-color)]',
     txt: 'text-[var(--tg-theme-text-color)]',
@@ -34,4 +40,25 @@ if (isTg) {
   }
 }
 
-export { tg, isTg, tgUser, tgColorClasses }
+const useTgAuth = () => {
+  const [isTgAuth, setTgIsAuth] = useState(false)
+
+  const tgSendInitData = async () => {
+    if (!isTg) {
+      return
+    }
+
+    const url = '/che_team/auth.php'
+    const method = 'POST'
+    const body = new FormData()
+    body.append('init_data', tg.initData)
+    const resp = await fetch(url, { method, body })
+    const data = await resp.json()
+
+    setTgIsAuth(data.is_valid)
+  }
+
+  return { isTgAuth, tgSendInitData }
+}
+
+export { tg, isTg, tgUser, tgColorClasses, useTgAuth, tgTheme }
