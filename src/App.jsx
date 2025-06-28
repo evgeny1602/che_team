@@ -1,91 +1,56 @@
 import { useEffect, useState } from 'react'
-import { useTgAuth, tg, tgColorClasses } from './tgUtils'
-
-import { images, selectedImages } from './images'
+import { useTgAuth, tg, tgColorClasses, isTg } from './tgUtils'
 
 import { AuthLoader } from './AuthLoader'
+import { AppContainer } from './AppContainer'
+import { Menu } from './Menu'
+import { ContentFooter } from './ContentFooter'
 
-function MenuBtn({ icon, onClick, isSelected }) {
+function ContentHeading({ text }) {
   return (
     <div
-      className={`transition-colors duration-300 flex flex-col flex-nowrap justify-center items-center h-full border-t-4 ${
-        isSelected ? 'border-[#df530e]' : 'border-transparent'
-      }`}
+      class={`text-center text-2xl uppercase font-semibold ${tgColorClasses.txt}`}
     >
-      <img
-        src={isSelected ? selectedImages[icon] : images[icon]}
-        className={`w-[35px] h-[35px] opacity-80`}
-        onClick={onClick}
-      />
+      {text}
     </div>
   )
 }
 
-function Menu() {
-  const [selectedPage, setSelectedPage] = useState('myGames')
-
-  const pages = ['myGames', 'games', 'players', 'myStatistics', 'statistics']
-
-  return (
-    <div
-      className={`fixed bottom-0 left-[50%] mb-4 flex h-[50px] w-[90vw] -translate-x-[50%] flex-row flex-nowrap items-center justify-center gap-6 rounded-4xl ${tgColorClasses.bg}/50 ${tgColorClasses.txt} shadow-[0_0_10px] shadow-black/20 inset-shadow-[0_0_10px] inset-shadow-white/20 backdrop-blur-sm`}
-    >
-      {pages.map((page) => (
-        <MenuBtn
-          icon={page}
-          isSelected={selectedPage === page}
-          onClick={() => setSelectedPage(page)}
-          key={page}
-        />
-      ))}
-    </div>
-  )
+function MyGamesContent() {
+  return <ContentHeading text="Мои игры" />
 }
 
-function ContentFooter() {
-  return (
-    <div>
-      <br />
-      <br />
-      <br />
-      &nbsp;
-    </div>
-  )
+function GamesContent() {
+  return <ContentHeading text="Игры" />
 }
 
-function Content() {
-  return (
-    <div>
-      CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT
-      HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE
-      CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT
-      HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE
-      CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT
-      HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE
-      CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT
-      HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE
-      CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT
-      HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE
-      CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT
-      HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE
-      CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT
-      HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE
-      CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT
-      HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE
-      CONTENT HERE CONTENT HERE CONTENT HERE CONTENT HERE
-    </div>
-  )
+function PlayersContent() {
+  return <ContentHeading text="Игроки" />
 }
 
-function AppContainer({ children }) {
-  return (
-    <div className="h-[100vh] p-4 text-slate-500 relative w-full">
-      {children}
-    </div>
-  )
+function MyStatisticsContent() {
+  return <ContentHeading text="Моя статистика" />
 }
+
+function StatisticsContent() {
+  return <ContentHeading text="Статистика" />
+}
+
+const pages = [
+  { code: 'myGames', title: 'Мои игры', content: MyGamesContent },
+  { code: 'games', title: 'Игры', content: GamesContent },
+  { code: 'players', title: 'Игроки', content: PlayersContent },
+  {
+    code: 'myStatistics',
+    title: 'Моя статистика',
+    content: MyStatisticsContent,
+  },
+  { code: 'statistics', title: 'Статистика', content: StatisticsContent },
+]
 
 function App() {
+  const [selectedPageCode, setSelectedPageCode] = useState(pages[0].code)
+
   const { isTgAuth, tgSendInitData } = useTgAuth()
 
   useEffect(() => {
@@ -96,11 +61,23 @@ function App() {
   //   return <AuthLoader />
   // }
 
+  const ContentElement = pages.find(
+    (page) => page.code === selectedPageCode
+  ).content
+
+  if (isTg) {
+    tg.requestFullscreen()
+  }
+
   return (
     <AppContainer>
-      <Content />
+      <ContentElement />
       <ContentFooter />
-      <Menu />
+      <Menu
+        selectedPageCode={selectedPageCode}
+        pageCodes={pages.map((page) => page.code)}
+        onPageCodeSelect={(pageCode) => setSelectedPageCode(pageCode)}
+      />
     </AppContainer>
   )
 }
