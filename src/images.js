@@ -1,7 +1,7 @@
 import { tgTheme } from './tgUtils'
 
-import ballLight from './assets/dark-theme/ball.png'
-import ballDark from './assets/light-theme/ball.png'
+import ballDark from './assets/dark-theme/ball.png'
+import ballLight from './assets/light-theme/ball.png'
 
 import myGamesLight from './assets/light-theme/my_games.png'
 import myGamesDark from './assets/dark-theme/my_games.png'

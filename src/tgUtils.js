@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const tg = window.Telegram.WebApp
 const isTg = tg.initData != ''
@@ -23,6 +23,7 @@ let tgColorClasses = {
   btnBg: 'bg-[#40a7e3]',
   hint: 'text-[#999999]',
   link: 'text-[#168dcd]',
+  border: 'border-black',
 }
 
 if (isTg) {
@@ -37,11 +38,16 @@ if (isTg) {
     btnBg: 'bg-[var(--tg-theme-button-color)]',
     hint: 'text-[var(--tg-theme-hint-color)]',
     link: 'text-[var(--tg-theme-link-color)]',
+    border: 'border-[var(--tg-theme-text-color)]',
   }
 }
 
-const useTgAuth = () => {
+const useTg = () => {
   const [isTgAuth, setTgIsAuth] = useState(false)
+  const [isUserRegistered, setIsUserRegistered] = useState(false)
+  const [isUserRegisteredFetched, setIsUserRegisteredFetched] = useState(false)
+  const [isUserApproved, setIsUserApproved] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   const tgSendInitData = async () => {
     if (!isTg) {
@@ -58,7 +64,61 @@ const useTgAuth = () => {
     setTgIsAuth(data.is_valid)
   }
 
-  return { isTgAuth, tgSendInitData }
+  const fetchIsUserRegistered = async () => {
+    if (!isTgAuth) {
+      return
+    }
+
+    const resp = await fetch(`/che_team/api/users/tg/${tgUser.id}`)
+    const { users } = await resp.json()
+
+    setIsUserRegisteredFetched(true)
+
+    if (users.length > 0) {
+      if (users[0].is_approved == '1') {
+        setIsUserApproved(true)
+      }
+
+      if (users[0].is_admin == '1') {
+        setIsAdmin(true)
+      }
+
+      setIsUserRegistered(true)
+    } else {
+      setIsUserRegistered(false)
+    }
+  }
+
+  useEffect(() => {
+    tgSendInitData()
+  }, [])
+
+  useEffect(() => {
+    fetchIsUserRegistered()
+  }, [isTgAuth])
+
+  return {
+    isTgAuth,
+    isUserRegistered,
+    isUserRegisteredFetched,
+    isUserApproved,
+    isAdmin,
+  }
 }
 
-export { tg, isTg, tgUser, tgColorClasses, useTgAuth, tgTheme }
+const initTgApp = () => {
+  tg.disableVerticalSwipes()
+  tg.lockOrientation()
+  tg.expand()
+  if (tg.platform != 'tdesktop') {
+    tg.requestFullscreen()
+  }
+}
+
+const isMobile = ['android'].includes(tg.platform)
+
+if (isTg) {
+  initTgApp()
+}
+
+export { tg, isTg, tgUser, tgColorClasses, useTg, tgTheme, isMobile, initTgApp }

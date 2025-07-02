@@ -4,53 +4,87 @@ import Client from 'ssh2-sftp-client'
 import { stdout } from 'node:process'
 import { deployConfig } from './deployConfig.js'
 
-const excludes = ['light-theme', 'dark-theme']
+const imgExtensions = ['.png']
 
 const main = async () => {
+  const localFiles = fs.readdirSync(deployConfig.localDir)
+
+  let localFilesToUpload = []
+  let localImagesToUpload = []
+
+  for (const f of localFiles) {
+    const fullPath = path.join(deployConfig.localDir, f)
+    const stats = fs.statSync(fullPath)
+    const isDirectory = stats.isDirectory()
+
+    if (isDirectory) {
+      continue
+    }
+
+    const ext = path.extname(f)
+    const isImage = imgExtensions.includes(ext)
+
+    if (isImage) {
+      localImagesToUpload.push(f)
+    } else {
+      localFilesToUpload.push(f)
+    }
+  }
+
   const sftp = new Client()
 
   stdout.write('Connecting...')
   await sftp.connect(deployConfig)
   stdout.write(' [OK]\r\n')
 
-  stdout.write('Getting remote files list to remove...')
-  let filesToRemove = await sftp.list(deployConfig.remoteDir)
-  const imagesToRemove = await sftp.list(deployConfig.remoteImgDir)
-  filesToRemove.concat(imagesToRemove)
+  stdout.write('Getting remote files list...')
+  const filesLists = await Promise.all([
+    sftp.list(deployConfig.remoteDir),
+    sftp.list(deployConfig.remoteImgDir),
+  ])
+  const remoteFiles = [...filesLists[0], ...filesLists[1]]
   stdout.write(' [OK]\r\n')
 
-  for (const f of filesToRemove) {
-    if (excludes.includes(f.name)) {
-      continue
-    }
+  const remoteFilesToRemove = remoteFiles.filter((f) =>
+    f.name.startsWith('index-')
+  )
 
-    stdout.write(`Removing remote file "${f.name}" ...`)
-    const remoteFile = `${deployConfig.remoteDir}/${f.name}`
-    await sftp.delete(remoteFile)
-    stdout.write(' [OK]\r\n')
-  }
+  const removeTasks = remoteFilesToRemove.map((f) =>
+    sftp.delete(`${deployConfig.remoteDir}/${f.name}`)
+  )
 
-  const filesToUpload = fs.readdirSync(deployConfig.localDir)
+  stdout.write(`Removing remote files ...`)
+  await Promise.all(removeTasks)
+  stdout.write(' [OK]\r\n')
 
-  for (const f of filesToUpload) {
-    const imgExtensions = ['.png']
-    const fullPath = path.join(deployConfig.localDir, f)
-    const ext = path.extname(f)
-    const stats = fs.statSync(fullPath)
+  const remoteFileNames = remoteFiles
+    .filter((f) => !remoteFilesToRemove.includes(f))
+    .map((f) => f.name)
 
-    if (stats.isDirectory()) {
-      continue
-    }
+  localFilesToUpload = localFilesToUpload.filter(
+    (f) => !remoteFileNames.includes(f)
+  )
+  localImagesToUpload = localImagesToUpload.filter(
+    (f) => !remoteFileNames.includes(f)
+  )
 
-    stdout.write(`Uploading file "${f}" ...`)
-    const localFile = `${deployConfig.localDir}/${f}`
-    let remoteFile = `${deployConfig.remoteDir}/${f}`
-    if (imgExtensions.includes(ext)) {
-      remoteFile = `${deployConfig.remoteImgDir}/${f}`
-    }
-    await sftp.put(fs.createReadStream(localFile), remoteFile)
-    stdout.write(' [OK]\r\n')
-  }
+  const uploadDataFiles = localFilesToUpload.map((f) => [
+    `${deployConfig.localDir}/${f}`,
+    `${deployConfig.remoteDir}/${f}`,
+  ])
+
+  const uploadDataImages = localImagesToUpload.map((f) => [
+    `${deployConfig.localDir}/${f}`,
+    `${deployConfig.remoteImgDir}/${f}`,
+  ])
+
+  const uploadTasks = [...uploadDataFiles, ...uploadDataImages].map((data) =>
+    sftp.put(fs.createReadStream(data[0]), data[1])
+  )
+
+  stdout.write('Uploading files...')
+  await Promise.all(uploadTasks)
+  stdout.write(' [OK]\r\n')
 
   stdout.write('Disconnecting...')
   await sftp.end()

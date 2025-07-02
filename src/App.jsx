@@ -1,83 +1,68 @@
-import { useEffect, useState } from 'react'
-import { useTgAuth, tg, tgColorClasses, isTg } from './tgUtils'
+import { useState } from 'react'
 
-import { AuthLoader } from './AuthLoader'
+import { useTg, isMobile } from './tgUtils'
+
 import { AppContainer } from './AppContainer'
 import { Menu } from './Menu'
+
+import { AuthLoader } from './AuthLoader'
 import { ContentFooter } from './ContentFooter'
+import { ContentHeader } from './ContentHeader'
+import { RegistrationRequest } from './RegistrationRequest'
+import { WaitingApproveMsg } from './WaitingApproveMsg'
 
-function ContentHeading({ text }) {
-  return (
-    <div
-      class={`text-center text-2xl uppercase font-semibold ${tgColorClasses.txt}`}
-    >
-      {text}
-    </div>
-  )
-}
-
-function MyGamesContent() {
-  return <ContentHeading text="Мои игры" />
-}
-
-function GamesContent() {
-  return <ContentHeading text="Игры" />
-}
-
-function PlayersContent() {
-  return <ContentHeading text="Игроки" />
-}
-
-function MyStatisticsContent() {
-  return <ContentHeading text="Моя статистика" />
-}
-
-function StatisticsContent() {
-  return <ContentHeading text="Статистика" />
-}
-
-const pages = [
-  { code: 'myGames', title: 'Мои игры', content: MyGamesContent },
-  { code: 'games', title: 'Игры', content: GamesContent },
-  { code: 'players', title: 'Игроки', content: PlayersContent },
-  {
-    code: 'myStatistics',
-    title: 'Моя статистика',
-    content: MyStatisticsContent,
-  },
-  { code: 'statistics', title: 'Статистика', content: StatisticsContent },
-]
+import { pages, contentPages } from './pages'
 
 function App() {
-  const [selectedPageCode, setSelectedPageCode] = useState(pages[0].code)
+  const [selectedPageCode, setSelectedPageCode] = useState(contentPages[0])
 
-  const { isTgAuth, tgSendInitData } = useTgAuth()
+  const {
+    isTgAuth,
+    isUserRegistered,
+    isUserRegisteredFetched,
+    isUserApproved,
+    isAdmin,
+  } = useTg()
 
-  useEffect(() => {
-    tgSendInitData()
-  }, [])
+  let ContentElement = pages[selectedPageCode].content
 
-  // if (!isTgAuth) {
-  //   return <AuthLoader />
-  // }
-
-  const ContentElement = pages.find(
-    (page) => page.code === selectedPageCode
-  ).content
-
-  if (isTg) {
-    tg.requestFullscreen()
+  if (!isTgAuth) {
+    ContentElement = AuthLoader
   }
+
+  if (isUserRegisteredFetched) {
+    if (isUserRegistered && !isUserApproved) {
+      ContentElement = WaitingApproveMsg
+    }
+
+    if (!isUserRegistered) {
+      ContentElement = RegistrationRequest
+    }
+  }
+
+  const isMenuVisible = [
+    AuthLoader,
+    WaitingApproveMsg,
+    RegistrationRequest,
+  ].includes(ContentElement)
+    ? false
+    : true
 
   return (
     <AppContainer>
-      <ContentElement />
+      {isMobile && <ContentHeader />}
+
+      <ContentElement isAdmin={isAdmin} />
+
       <ContentFooter />
-      <Menu
-        selectedPageCode={selectedPageCode}
-        pageCodes={pages.map((page) => page.code)}
-        onPageCodeSelect={(pageCode) => setSelectedPageCode(pageCode)}
-      />
+
+      {isMenuVisible && (
+        <Menu
+          selectedPageCode={selectedPageCode}
+          pageCodes={contentPages}
+          onPageCodeSelect={(pageCode) => setSelectedPageCode(pageCode)}
+        />
+      )}
     </AppContainer>
   )
 }
