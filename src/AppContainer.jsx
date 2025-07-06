@@ -1,6 +1,10 @@
+import { tgColorClasses } from './tgUtils'
+
 export function AppContainer({ children }) {
   return (
-    <div className="h-[100vh] p-4 text-slate-500 relative w-full">
+    <div
+      className={`app-container w-full h-[100vh] p-4 relative ${tgColorClasses.txt}`}
+    >
       {children}
     </div>
   )

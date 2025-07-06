@@ -11,21 +11,26 @@
         is_approved
     EVENT
         id
-        date_time    
-        duration    
         name  (Тренировка в Юбилейном, Тренировка в РИИ с тренером, ...)
-        description     
+        description
+        date_time    
+        duration     
         min_users_count   
         max_users_count
         price
         user_id  
-        is_held (true = игра состоялась, false = игра не состоялась)
+        is_held (true = игра состоялась | false = игра не состоялась)
     USER_TO_EVENT
         id
         event_id
         user_id
-        friends_count
-        result  (visited, missed)
+        result  (1 = пришел на игру | 0 = не пришел на игру)
+    FRIEND_TO_EVENT
+        id
+        name
+        user_id
+        event_id
+        result  (1 = пришел на игру | 0 = не пришел на игру)
 
 ==================================================
 
@@ -100,17 +105,16 @@ API
         price
         is_held
     -----------------------------------------------------
-    POST /user_to_events - добавить пользователя к событию
-        event_id
-        user_id
-        user_event_status
-    DELETE /user_to_events/user/[id]/event/[id] - удалить пользователя из события
-    PUT /user_to_events/user/[id]/event/[id] - изменить пользователя в событии
-        user_event_status_id
-        user_event_status
+    POST /user_to_event/user/[id]/event/[id] - добавить пользователя к событию
+        friends
+            name
+    DELETE /user_to_event/user/[id]/event/[id] - удалить пользователя из события
+    PUT /user_to_event/user/[id]/event/[id] - изменить пользователя в событии
+        friends
+            name
         result
-    GET /user_to_events/user/[id] - получить события пользователя
-    GET /user_to_events/event/[id] - получить пользователей события 
+    GET /user_to_event/user/[id] - получить события пользователя
+    GET /user_to_event/event/[id] - получить пользователей события 
     -----------------------------------------------------
     GET /statistics/events - получить статистику по событиям
         id

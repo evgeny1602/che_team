@@ -1,47 +1,43 @@
 import { useState } from 'react'
-import { tgColorClasses, tgUser } from './tgUtils'
+import { tgUser } from './tgUtils'
 
 import { PrimaryButton } from './PrimaryButton'
-import { ContentContainer } from './ContentContainer'
-import { ContentInnerContainer } from './ContentInnerContainer'
 import { ContentHeading } from './ContentHeading'
 
 import { sendRegistrationRequest } from './api'
+import { FormInput } from './FormInput'
 
 export function RegistrationRequest() {
   const [userName, setUserName] = useState('')
 
   const onSubmit = async () => {
-    await sendRegistrationRequest(
+    await sendRegistrationRequest({
       userName,
-      tgUser.id,
-      tgUser.username,
-      tgUser.photo_url
-    )
+      tgUserId: tgUser.id,
+      tgUserName: tgUser.username,
+      photoUrl: tgUser.photo_url,
+    })
 
     location.reload()
   }
 
   return (
-    <ContentContainer>
+    <>
       <ContentHeading>Заявка на регистрацию</ContentHeading>
 
-      <ContentInnerContainer>
+      <div className="flex flex-col flex-nowrap justify-center items-center gap-8">
         <div className="text-center">
-          <p>Вы не зарегистрированы в нашем боте.</p>
-          <p>Для регистрации введите свое имя и нажмите на кнопку ниже.</p>
+          Вы не зарегистрированы в нашем боте.
+          <br />
+          Для регистрации введите свое имя и нажмите на кнопку ниже.
         </div>
 
-        <div className="min-h-7"></div>
-
-        <input
-          className={`rounded-4xl px-4 py-2 border-1 ${tgColorClasses.border}`}
-          placeholder="Ваше имя"
+        <FormInput
+          type="text"
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
+          placeholder="Ваше имя"
         />
-
-        <div className="min-h-7"></div>
 
         <PrimaryButton
           disabled={userName.length < 3}
@@ -49,7 +45,7 @@ export function RegistrationRequest() {
         >
           Подать заявку на регистрацию
         </PrimaryButton>
-      </ContentInnerContainer>
-    </ContentContainer>
+      </div>
+    </>
   )
 }

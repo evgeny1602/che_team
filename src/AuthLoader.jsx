@@ -3,11 +3,11 @@ import { tgColorClasses } from './tgUtils'
 
 export function AuthLoader() {
   return (
-    <div
-      className={`w-full h-[100vh] flex flex-col gap-4 flex-nowrap justify-start pt-40 items-center text-lg font-light`}
-    >
+    <div className="auth-loader h-full flex flex-col flex-nowrap justify-center items-center">
       <LoadSpinner />
-      <span className={`opacity-50 ${tgColorClasses.txt}`}>Авторизация...</span>
+      <span className={`text-lg font-light opacity-50 ${tgColorClasses.txt}`}>
+        Авторизация...
+      </span>
     </div>
   )
 }

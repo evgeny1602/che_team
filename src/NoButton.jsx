@@ -1,9 +1,9 @@
 import { BaseButton } from './BaseButton'
 
-export function DangerButton({ children, disabled, onClick }) {
+export function NoButton({ children, disabled, onClick }) {
   return (
     <BaseButton
-      variant="danger"
+      variant="no"
       disabled={disabled}
       onClick={onClick}
     >

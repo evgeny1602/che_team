@@ -1,13 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-import { useTg, isMobile } from './tgUtils'
+import { tgSendInitData } from './tgUtils'
 
 import { AppContainer } from './AppContainer'
 import { Menu } from './Menu'
 
 import { AuthLoader } from './AuthLoader'
-import { ContentFooter } from './ContentFooter'
-import { ContentHeader } from './ContentHeader'
 import { RegistrationRequest } from './RegistrationRequest'
 import { WaitingApproveMsg } from './WaitingApproveMsg'
 
@@ -15,48 +13,40 @@ import { pages, contentPages } from './pages'
 
 function App() {
   const [selectedPageCode, setSelectedPageCode] = useState(contentPages[0])
-
-  const {
-    isTgAuth,
-    isUserRegistered,
-    isUserRegisteredFetched,
-    isUserApproved,
-    isAdmin,
-  } = useTg()
+  const [appInitialized, setAppInitialized] = useState(false)
 
   let ContentElement = pages[selectedPageCode].content
 
-  if (!isTgAuth) {
+  if (!window.tgIsAuth) {
     ContentElement = AuthLoader
   }
 
-  if (isUserRegisteredFetched) {
-    if (isUserRegistered && !isUserApproved) {
+  if (window.isUserRegisteredFetched) {
+    if (window.isUserRegistered && !window.isUserApproved) {
       ContentElement = WaitingApproveMsg
     }
 
-    if (!isUserRegistered) {
+    if (!window.isUserRegistered) {
       ContentElement = RegistrationRequest
     }
   }
 
-  const isMenuVisible = [
-    AuthLoader,
-    WaitingApproveMsg,
-    RegistrationRequest,
-  ].includes(ContentElement)
-    ? false
-    : true
+  useEffect(() => {
+    const doInit = async () => {
+      const initResult = await tgSendInitData()
+      setAppInitialized(initResult)
+    }
+
+    doInit()
+  }, [])
 
   return (
     <AppContainer>
-      {isMobile && <ContentHeader />}
+      <ContentElement />
 
-      <ContentElement isAdmin={isAdmin} />
-
-      <ContentFooter />
-
-      {isMenuVisible && (
+      {![AuthLoader, WaitingApproveMsg, RegistrationRequest].includes(
+        ContentElement
+      ) && (
         <Menu
           selectedPageCode={selectedPageCode}
           pageCodes={contentPages}

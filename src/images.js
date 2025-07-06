@@ -31,7 +31,7 @@ export const selectedImages = {
   myStatistics: myStatisticsSelected,
 }
 
-const themedImages = {
+export const themedImages = {
   light: {
     ball: ballLight,
     myGames: myGamesLight,
