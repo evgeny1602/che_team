@@ -4,13 +4,15 @@ import { SuccessButton } from './SuccessButton'
 import { FormInput } from './FormInput'
 import { FormContainer } from './FormContainer'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DangerButton } from './DangerButton'
 import { FiPlusCircle } from 'react-icons/fi'
 import { FiXCircle } from 'react-icons/fi'
 import { FiCheckCircle } from 'react-icons/fi'
 
-export function NewGameForm() {
+export function NewGameForm({ game }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [id, setId] = useState(null)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [dateTime, setDateTime] = useState('')
@@ -19,7 +21,28 @@ export function NewGameForm() {
   const [maxUsersCount, setMaxUsersCount] = useState(0)
   const [price, setPrice] = useState(0)
 
-  const { addGame, isLoading } = useGames()
+  useEffect(() => {
+    const setGame = (game) => {
+      if (!game) {
+        return
+      }
+
+      setId(game.id)
+      setName(game.name)
+      setDescription(game.description)
+      setDateTime(game.dateTime)
+      setDuration(game.duration)
+      setMinUsersCount(game.minUsersCount)
+      setMaxUsersCount(game.maxUsersCount)
+      setPrice(game.price)
+
+      setIsExpanded(true)
+    }
+
+    setGame(game)
+  }, [game])
+
+  const { addGame, editGame, isLoading } = useGames()
 
   const clearForm = () => {
     setName('')
@@ -32,7 +55,7 @@ export function NewGameForm() {
   }
 
   const onSubmit = async () => {
-    await addGame({
+    let gameData = {
       name,
       description,
       dateTime,
@@ -41,8 +64,17 @@ export function NewGameForm() {
       maxUsersCount,
       price,
       userId: window.userId,
-    })
+    }
+
+    if (id) {
+      await editGame({ id, ...gameData })
+    } else {
+      await addGame(gameData)
+    }
+
     clearForm()
+
+    setIsExpanded(false)
   }
 
   const isFormValid =
@@ -56,6 +88,7 @@ export function NewGameForm() {
 
   return (
     <FormContainer
+      isExpanded={isExpanded}
       title={
         <span className="flex flex-row flex-nowrap gap-2 items-center">
           <FiPlusCircle />
@@ -121,7 +154,7 @@ export function NewGameForm() {
           isLoading={isLoading}
         >
           <FiCheckCircle />
-          Добавить
+          Сохранить
         </SuccessButton>
 
         <DangerButton onClick={clearForm}>

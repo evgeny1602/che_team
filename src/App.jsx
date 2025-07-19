@@ -44,6 +44,8 @@ function App() {
     <AppContainer>
       <ContentElement />
 
+      <div className="min-h-[100px]"></div>
+
       {![AuthLoader, WaitingApproveMsg, RegistrationRequest].includes(
         ContentElement
       ) && (

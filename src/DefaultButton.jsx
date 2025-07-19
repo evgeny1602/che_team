@@ -1,17 +1,11 @@
 import { BaseButton } from './BaseButton'
 
-export function SuccessButton({
-  children,
-  disabled,
-  onClick,
-  size = 'normal',
-}) {
+export function DefaultButton({ children, disabled, onClick }) {
   return (
     <BaseButton
-      variant="success"
+      variant="default"
       disabled={disabled}
       onClick={onClick}
-      size={size}
     >
       {children}
     </BaseButton>

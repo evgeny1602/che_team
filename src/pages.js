@@ -29,14 +29,14 @@ const pages = {
     title: 'Игроки',
     content: PlayersContent,
   },
-  myStatistics: {
-    title: 'Моя статистика',
-    content: MyStatisticsContent,
-  },
-  statistics: {
-    title: 'Статистика',
-    content: StatisticsContent,
-  },
+  // myStatistics: {
+  //   title: 'Моя статистика',
+  //   content: MyStatisticsContent,
+  // },
+  // statistics: {
+  //   title: 'Статистика',
+  //   content: StatisticsContent,
+  // },
 }
 
 const servicePages = ['register', 'approve']

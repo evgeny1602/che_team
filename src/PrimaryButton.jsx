@@ -5,6 +5,7 @@ export function PrimaryButton({
   onClick,
   disabled,
   isLoading = false,
+  size = 'normal',
 }) {
   return (
     <BaseButton
@@ -12,6 +13,7 @@ export function PrimaryButton({
       disabled={disabled}
       onClick={onClick}
       isLoading={isLoading}
+      size={size}
     >
       {children}
     </BaseButton>

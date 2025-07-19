@@ -33,7 +33,7 @@ export const sendRegistrationRequest = async (registerData) => {
 
   body.append('name', registerData.userName)
   body.append('tg_id', registerData.tgUserId)
-  body.append('tg_username', registerData.tgUsername)
+  body.append('tg_username', registerData.tgUserName)
   body.append('tg_avatar', registerData.photoUrl)
   body.append('user_group_id', 2)
 
@@ -72,6 +72,8 @@ export const fetchPlayersList = async () => {
   const resp = await fetch('/che_team/api/users')
   const data = await resp.json()
 
+  // console.log(data)
+
   return checkFetchResp(data, 'users', mapUser)
 }
 
@@ -89,6 +91,7 @@ const mapEvent = (item) => ({
   userId: item.user_id,
   isHeld: item.is_held == 1,
   userName: item.user_name,
+  users: item.users,
 })
 
 export const fetchEventsList = async () => {
@@ -96,6 +99,25 @@ export const fetchEventsList = async () => {
   const data = await resp.json()
 
   return checkFetchResp(data, 'events', mapEvent)
+}
+
+export const editEvent = async (eventData) => {
+  const resp = await fetch(`/che_team/api/events/${eventData.id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      date_time: eventData.dateTime,
+      duration: eventData.duration,
+      name: eventData.name,
+      description: eventData.description,
+      min_users_count: eventData.minUsersCount,
+      max_users_count: eventData.maxUsersCount,
+      price: eventData.price,
+      user_id: eventData.userId,
+    }),
+  })
+  const data = await resp.json()
+
+  return checkAddDeleteApproveResp(data)
 }
 
 export const deleteEvent = async (eventId) => {
@@ -129,6 +151,19 @@ export const addEvent = async (eventData) => {
 }
 
 // ------------------------------------------------------
+
+export const editEventPlayer = async (userId, eventId, friends) => {
+  const resp = await fetch(
+    `/che_team/api/user_to_event/user/${userId}/event/${eventId}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify({ friends }),
+    }
+  )
+  const data = await resp.json()
+
+  return checkAddDeleteApproveResp(data)
+}
 
 export const addEventPlayer = async (userId, eventId, friends) => {
   let body = new FormData()

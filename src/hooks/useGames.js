@@ -33,9 +33,20 @@ export const useGames = () => {
     }
   }
 
+  const editGame = async (gameData) => {
+    setIsLoading(true)
+
+    const successEdit = await api.editEvent(gameData)
+    if (successEdit) {
+      await refreshGames()
+    }
+
+    setIsLoading(false)
+  }
+
   useEffect(() => {
     refreshGames()
   }, [])
 
-  return { games, isLoading, refreshGames, addGame, removeGame }
+  return { games, isLoading, refreshGames, addGame, editGame, removeGame }
 }

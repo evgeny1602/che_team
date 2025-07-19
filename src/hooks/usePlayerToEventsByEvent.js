@@ -38,9 +38,28 @@ export const usePlayerToEventsByEvent = (eventId) => {
     setIsLoading(false)
   }
 
+  const setFriends = async (userId, friends) => {
+    setIsLoading(true)
+
+    const successEdit = await api.editEventPlayer(userId, eventId, friends)
+
+    if (successEdit) {
+      await refreshPlayers()
+    }
+
+    setIsLoading(false)
+  }
+
   useEffect(() => {
     refreshPlayers()
   }, [])
 
-  return { players, isLoading, addPlayer, removePlayer, refreshPlayers }
+  return {
+    players,
+    isLoading,
+    addPlayer,
+    removePlayer,
+    refreshPlayers,
+    setFriends,
+  }
 }
